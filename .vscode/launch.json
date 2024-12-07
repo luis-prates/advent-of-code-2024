@@ -154,6 +154,24 @@
         {
             "type": "lldb",
             "request": "launch",
+            "name": "Debug executable '06'",
+            "cargo": {
+                "args": [
+                    "build",
+                    "--bin=06",
+                    "--package=adv-code-2024"
+                ],
+                "filter": {
+                    "name": "06",
+                    "kind": "bin"
+                }
+            },
+            "args": [],
+            "cwd": "${workspaceFolder}"
+        },
+        {
+            "type": "lldb",
+            "request": "launch",
             "name": "Debug executable 'NN'",
             "cargo": {
                 "args": [
