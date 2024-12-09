@@ -32,6 +32,28 @@ fn recursive_check(result: usize, operands: &Vec<usize>, current: usize, cumul: 
     }
 }
 
+fn recursive_check_part2(
+    result: usize,
+    operands: &Vec<usize>,
+    current: usize,
+    cumul: usize,
+) -> bool {
+    if current == operands.len() {
+        return cumul == result;
+    }
+
+    if recursive_check_part2(result, operands, current + 1, cumul + operands[current])
+        || recursive_check_part2(result, operands, current + 1, cumul * operands[current])
+    {
+        true
+    } else {
+        let mut cumul_string = cumul.to_string();
+        let current_string = operands[current].to_string();
+        cumul_string.push_str(&current_string);
+        recursive_check_part2(result, operands, current + 1, cumul_string.parse().unwrap())
+    }
+}
+
 fn main() -> Result<()> {
     start_day(DAY);
 
@@ -75,17 +97,41 @@ fn main() -> Result<()> {
     //endregion
 
     //region Part 2
-    // println!("\n=== Part 2 ===");
-    //
-    // fn part2<R: BufRead>(reader: R) -> Result<usize> {
-    //     Ok(0)
-    // }
-    //
-    // assert_eq!(0, part2(BufReader::new(TEST.as_bytes()))?);
-    //
-    // let input_file = BufReader::new(File::open(INPUT_FILE)?);
-    // let result = time_snippet!(part2(input_file)?);
-    // println!("Result = {}", result);
+    println!("\n=== Part 2 ===");
+
+    fn part2<R: BufRead>(reader: R) -> Result<usize> {
+        let mut total = 0;
+        let mut results: Vec<usize> = vec![];
+        let mut operands: Vec<Vec<usize>> = vec![];
+        // TODO: Solve Part 1 of the puzzle
+        reader.lines().try_for_each(|line| {
+            let line = line?;
+            let split_string = line.split(':').collect::<Vec<_>>();
+            results.push(split_string[0].parse().unwrap());
+            operands.push(
+                split_string[1]
+                    .split_whitespace()
+                    .map(|operand| operand.parse().unwrap())
+                    .collect(),
+            );
+            Ok(())
+        })?;
+
+        for (index, result) in results.iter().enumerate() {
+            let valid = recursive_check_part2(*result, &operands[index], 1, operands[index][0]);
+            if valid {
+                total += result;
+            }
+        }
+
+        Ok(total)
+    }
+
+    assert_eq!(11387, part2(BufReader::new(TEST.as_bytes()))?);
+
+    let input_file = BufReader::new(File::open(INPUT_FILE)?);
+    let result = time_snippet!(part2(input_file)?);
+    println!("Result = {}", result);
     //endregion
 
     Ok(())
